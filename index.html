@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Psychopath test</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200..900&family=Rubik+Glitch&display=swap');
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #fbe4e9;
+            font-family: sans-serif;
+            overflow: hidden;
+        }
+
+        .card {
+            flex-shrink: 0;
+            background: white;
+            padding: 30px;
+            border-radius: 30px;
+            box-sizing: border-box;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 550px;
+            max-width: 90%;
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .card.expanded { min-height: 800px; }
+        .image { max-height: 300px; width: 90%; margin-top: 20px; pointer-events: none; object-fit: contain; }
+
+        .btn-group { 
+            margin-top: 40px; 
+            width: 100%; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 150px;
+            position: relative;
+        }
+
+        h1 { font-size: 27px; color: #333; margin-top: 20px; pointer-events: none; padding: 0 20px; white-space: nowrap; }
+
+        #yesBtn {
+            background-color: #e91e63;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            transition: transform 0.2s ease-out;
+            z-index: 10;
+        }
+
+        #noBtn {
+            background-color: #eee;
+            color: #555;
+            padding: 12px 28px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 18px;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        #success-extra {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            margin-top: 50px;
+        }
+        .show-msg #success-extra { display: block; opacity: 1; }
+
+        /* 블랙 오버레이 설정 */
+        #fade-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: black;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 2s ease;
+            z-index: 10000;
+        }
+        .fade-active { opacity: 1 !important; visibility: visible !important; }
+
+        /* 중앙 정렬 공식: top/left 50% + translate(-50%, -50%) */
+        .msg, #fade-gif, #final-msg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            opacity: 0;
+            transition: opacity 1s ease;
+            margin: 0;
+        }
+
+        .msg {
+            width: 100%;
+            color: #ffffff;
+            font-family: 'Noto Serif KR', serif;
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+            pointer-events: none;
+        }
+
+        #fade-gif {
+            width: 80%;
+            max-width: 500px; /* 크기를 500으로 고정 */
+            height: auto;
+            z-index: 10002;
+            transition: opacity 0.5s ease;
+        }
+
+        #final-msg {
+            width: 100%;
+            color: #ff4242;
+            font-family: "Rubik Glitch", system-ui;
+            font-size: 5.5rem;
+            font-weight: 400;          /* 아주 두껍게 */
+            letter-spacing: 20px;
+            text-shadow: 0 0 15px rgba(148, 10, 10, 1);
+            z-index: 10003;
+            white-space: nowrap;
+        }
+
+        .msg:nth-child(3) { color: #ff4d4d; }
+        .msg-visible { opacity: 1 !important; }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 18px !important; }
+            h2 { font-size: 18px; white-space: nowrap; }
+            .btn-group { gap: 80px; }
+            #yesBtn, #noBtn { padding: 10px 20px; font-size: 16px; }
+            .msg { font-size: 2rem; }
+            #final-msg { font-size: 2.5rem; letter-spacing: 5px; }
+            #fade-gif { max-width: 250px; }
+            .image { max-height: 200px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card" id="mainCard">
+    <div id="content">
+        <img id="mainImg" src="bok.png" class="image">
+        <h1 id="mainTitle">Do you think this puppy is cute?</h1>
+        <div class="btn-group">
+            <button id="yesBtn">Yes</button>
+            <button id="noBtn">No</button>
+        </div>
+        <div id="success-extra">
+            <h2 style="color: #e91e63;">I know. But you're not cute. Idiot.</h2>
+            <img src="fuck.png" class="image" style="width: 100%; max-width: 400px;">
+        </div>
+    </div>
+</div>
+
+<div id="fade-overlay">
+    <div id="fade-messages">
+        <h1 class="msg">뭐하니?</h1>
+        <h1 class="msg">그럼 나, 황복.</h1>
+        <h1 class="msg">너 죽여도 되니?</h1>
+    </div>
+    <img id="fade-gif" src="gun.gif">
+    <h1 id="final-msg">You're died...</h1>
+</div>
+
+<script>
+    const card = document.getElementById('mainCard');
+    const noBtn = document.getElementById('noBtn');
+    const yesBtn = document.getElementById('yesBtn');
+    const fadeOverlay = document.getElementById('fade-overlay');
+    
+    let noCount = 0;
+    let isSuccess = false;
+    const maxClicks = 3; // 테스트용 3회
+    const phrases = ["hey", "wtf", "serious?"];
+
+    yesBtn.onclick = () => {
+        isSuccess = true;
+        card.classList.add('show-msg');
+        card.classList.add('expanded');
+        document.querySelector('.btn-group').style.display = 'none';
+    };
+
+    noBtn.onclick = () => {
+        noCount++;
+        if (noCount === maxClicks - 1) {
+            noBtn.innerText = "AREYOUMAD?!?!??!";
+            noBtn.style.transform = `scale(5)`;
+            noBtn.style.zIndex = "9999";
+            noBtn.style.backgroundColor = "#000000";
+            noBtn.style.color = "#ffffff";
+        }
+        if (noCount >= maxClicks) {
+            triggerFadeOut();
+            return;
+        }
+        if (Math.random() < 0.3) {
+            const phraseIndex = Math.floor(Math.random() * phrases.length);
+            noBtn.innerText = phrases[phraseIndex];
+        }
+    };
+
+    document.addEventListener('mousemove', (e) => {
+        if (isSuccess) return;
+        const yesRect = yesBtn.getBoundingClientRect();
+        const yesCenterX = yesRect.left + yesRect.width / 2;
+        const yesCenterY = yesRect.top + yesRect.height / 2;
+        const distYes = Math.sqrt(Math.pow(e.clientX - yesCenterX, 2) + Math.pow(e.clientY - yesCenterY, 2));
+
+        if (distYes < 200) {
+            const scale = 1 + (200 - distYes) / 100;
+            yesBtn.style.transform = `scale(${Math.min(scale, 3)})`;
+        } else {
+            yesBtn.style.transform = `scale(1)`;
+        }
+    });
+
+    function triggerFadeOut() {
+        const overlay = document.getElementById('fade-overlay');
+        const msgs = document.querySelectorAll('.msg');
+        const gif = document.getElementById('fade-gif');
+        const finalMsg = document.getElementById('final-msg');
+
+        overlay.classList.add('fade-active');
+
+        let delay = 2000;
+
+        msgs.forEach((msg, index) => {
+            setTimeout(() => { msg.classList.add('msg-visible'); }, delay);
+            delay += 2500;
+            setTimeout(() => { msg.classList.remove('msg-visible'); }, delay - 500);
+        });
+
+        // GIF 등장
+        setTimeout(() => {
+            gif.style.opacity = '1';
+            gif.style.display = 'block';
+        }, delay);
+
+        // 마지막 글자 등장
+        setTimeout(() => {
+            gif.style.display = 'none';
+            finalMsg.style.display = 'block';
+            finalMsg.classList.add('msg-visible');
+        }, delay + 4000);
+    }
+</script>
+</body>
+</html>
